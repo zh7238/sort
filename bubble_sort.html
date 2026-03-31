@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>氣泡排序法演示</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 90%;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+        .section {
+            margin: 30px 0;
+        }
+        .section h2 {
+            color: #667eea;
+            font-size: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .section ol, .section ul {
+            color: #555;
+            line-height: 1.8;
+        }
+        .array-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 250px;
+            margin: 30px 0;
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .bar {
+            width: 35px;
+            margin: 0 6px;
+            background-color: #667eea;
+            text-align: center;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 5px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .bar.active {
+            background-color: #ff6b6b;
+        }
+        .bar.sorted {
+            background-color: #51cf66;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #667eea;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #764ba2;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .info {
+            background-color: #f0f4ff;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 氣泡排序法演示</h1>
+        
+        <div class="section">
+            <h2>操作原理</h2>
+            <ol>
+                <li>從陣列的第一個元素開始，依次比較相鄰的兩個元素</li>
+                <li>如果前一個元素比後一個元素大，則交換它們的位置</li>
+                <li>完成一輪後，最大的元素會「浮」到陣列末尾</li>
+                <li>對剩下的未排序部分重複上述過程，直到整個陣列有序</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>時間複雜度分析</h2>
+            <div class="info">
+                <strong>最壞情況：O(n²)</strong><br>
+                當陣列逆序排列時，需要進行最多的比較和交換操作
+            </div>
+            <div class="info">
+                <strong>平均情況：O(n²)</strong><br>
+                隨機數據下的平均複雜度仍為二次方
+            </div>
+            <div class="info">
+                <strong>最佳情況：O(n)</strong><br>
+                當陣列已排序時，只需一次遍歷進行檢查
+            </div>
+            <div class="info">
+                <strong>空間複雜度：O(1)</strong><br>
+                原地排序，只需常數個額外變數
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>視覺化演示</h2>
+            <div class="array-container" id="array-container"></div>
+            <div class="controls">
+                <button onclick="startBubbleSort()" id="startBtn">開始排序</button>
+                <button onclick="resetArray()">重置</button>
+            </div>
+            <div class="stats">
+                <div>比較次數: <span id="comparisons">0</span></div>
+                <div>交換次數: <span id="swaps">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let array = [64, 34, 25, 12, 22, 11, 90];
+        let comparisons = 0;
+        let swaps = 0;
+        const container = document.getElementById('array-container');
+
+        // 初始化陣列視覺化
+        function renderArray() {
+            container.innerHTML = '';
+            const maxValue = Math.max(...array);
+            array.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.classList.add('bar');
+                bar.style.height = `${(value / maxValue) * 200}px`;
+                bar.textContent = value;
+                container.appendChild(bar);
+            });
+        }
+
+        // 延遲函數
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // 氣泡排序法
+        async function startBubbleSort() {
+            comparisons = 0;
+            swaps = 0;
+            document.getElementById('startBtn').disabled = true;
+            
+            const bars = document.getElementsByClassName('bar');
+            const n = array.length;
+
+            for (let i = 0; i < n - 1; i++) {
+                for (let j = 0; j < n - i - 1; j++) {
+                    // 標記正在比較的元素
+                    bars[j].classList.add('active');
+                    bars[j + 1].classList.add('active');
+                    comparisons++;
+                    document.getElementById('comparisons').textContent = comparisons;
+                    
+                    await sleep(300);
+
+                    // 比較並交換
+                    if (array[j] > array[j + 1]) {
+                        [array[j], array[j + 1]] = [array[j + 1], array[j]];
+                        swaps++;
+                        document.getElementById('swaps').textContent = swaps;
+                        renderArray();
+                    }
+
+                    bars[j].classList.remove('active');
+                    bars[j + 1].classList.remove('active');
+                }
+                // 標記已排序的元素
+                const sortedBars = document.getElementsByClassName('bar');
+                sortedBars[n - i - 1].classList.add('sorted');
+            }
+            // 標記第一個元素已排序
+            const sortedBars = document.getElementsByClassName('bar');
+            sortedBars[0].classList.add('sorted');
+            
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        // 重置陣列
+        function resetArray() {
+            array = [64, 34, 25, 12, 22, 11, 90];
+            comparisons = 0;
+            swaps = 0;
+            document.getElementById('comparisons').textContent = 0;
+            document.getElementById('swaps').textContent = 0;
+            renderArray();
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        // 初始化畫面
+        renderArray();
+    </script>
+</body>
+</html>
