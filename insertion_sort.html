@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>插入排序法演示</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #4facfe 0%, #00c6ff 100%);
+        }
+
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+            max-width: 900px;
+            width: 90%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+
+        .section {
+            margin: 30px 0;
+        }
+
+        .section h2 {
+            color: #0087cc;
+            font-size: 18px;
+            border-bottom: 2px solid #0087cc;
+            padding-bottom: 10px;
+        }
+
+        .section ol, .section ul, .section p {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .array-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 250px;
+            margin: 30px 0 15px;
+            background-color: #f4fbff;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .bar {
+            width: 35px;
+            margin: 0 6px;
+            background-color: #2196f3;
+            text-align: center;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 5px;
+            border-radius: 4px;
+            transition: background-color 0.25s;
+            flex-shrink: 0;
+        }
+
+        .bar.sorted {
+            background-color: #51cf66;
+        }
+
+        .bar.current {
+            background-color: #ff8f00;
+        }
+
+        .bar.compare {
+            background-color: #ffd54f;
+            color: #333;
+        }
+
+        .bar.shift {
+            background-color: #ff6b6b;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #0087cc;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #00689d;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .info {
+            background-color: #eef8ff;
+            padding: 15px;
+            border-left: 4px solid #0087cc;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .status {
+            text-align: center;
+            color: #444;
+            font-size: 14px;
+            min-height: 24px;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            display: inline-block;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .bar {
+                width: 30px;
+                margin: 0 4px;
+                font-size: 13px;
+            }
+
+            button {
+                width: 100%;
+                max-width: 220px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧩 插入排序法演示</h1>
+
+        <div class="section">
+            <h2>操作原理</h2>
+            <ol>
+                <li>把陣列想成「左邊已排序，右邊未排序」。</li>
+                <li>每次從未排序區取出一個元素（key）。</li>
+                <li>將 key 與左邊已排序元素由右往左比較，找到正確插入位置。</li>
+                <li>比 key 大的元素向右移動一格，最後把 key 插入空位。</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>操作過程步驟</h2>
+            <ol>
+                <li>從 i = 1 開始，令 key = array[i]。</li>
+                <li>設 j = i - 1，向左比較 array[j] 與 key。</li>
+                <li>若 array[j] &gt; key，將 array[j] 右移到 array[j + 1]，j 持續左移。</li>
+                <li>直到 j &lt; 0 或 array[j] &lt;= key 為止。</li>
+                <li>把 key 放到 array[j + 1]，完成一輪插入。</li>
+                <li>i 往右移動，重複到陣列尾端。</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>時間複雜度分析</h2>
+            <div class="info">
+                <strong>最壞情況：O(n²)</strong><br>
+                當陣列為逆序時，每次插入都要一路比較與搬移到最前面
+            </div>
+            <div class="info">
+                <strong>平均情況：O(n²)</strong><br>
+                隨機資料下，平均每輪仍需搬移一定數量元素
+            </div>
+            <div class="info">
+                <strong>最佳情況：O(n)</strong><br>
+                當陣列已排序時，每輪只需一次比較就可完成插入
+            </div>
+            <div class="info">
+                <strong>空間複雜度：O(1)</strong><br>
+                原地排序，額外只使用少量變數（key、j）
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>視覺化演示</h2>
+            <div class="array-container" id="array-container"></div>
+            <div class="status" id="status-text">按下「開始排序」觀察 key 如何插入左側已排序區</div>
+
+            <div class="legend">
+                <div><span class="dot" style="background:#51cf66;"></span>已排序區</div>
+                <div><span class="dot" style="background:#ff8f00;"></span>當前 key</div>
+                <div><span class="dot" style="background:#ffd54f;"></span>比較中</div>
+                <div><span class="dot" style="background:#ff6b6b;"></span>右移中</div>
+            </div>
+
+            <div class="controls">
+                <button onclick="startInsertionSort()" id="startBtn">開始排序</button>
+                <button onclick="resetArray()" id="resetBtn">重置</button>
+            </div>
+            <div class="stats">
+                <div>比較次數: <span id="comparisons">0</span></div>
+                <div>搬移次數: <span id="moves">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const initialArray = [64, 34, 25, 12, 22, 11, 90];
+        let array = [...initialArray];
+        let comparisons = 0;
+        let moves = 0;
+        let isSorting = false;
+
+        const container = document.getElementById('array-container');
+        const statusText = document.getElementById('status-text');
+        const comparisonsText = document.getElementById('comparisons');
+        const movesText = document.getElementById('moves');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        function renderArray(state = {}) {
+            const {
+                sortedEnd = -1,
+                currentIndex = -1,
+                compareIndex = -1,
+                shiftIndex = -1
+            } = state;
+
+            container.innerHTML = '';
+            const maxValue = Math.max(...array);
+
+            array.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.classList.add('bar');
+                bar.style.height = `${(value / maxValue) * 200}px`;
+                bar.textContent = value;
+
+                if (index <= sortedEnd) {
+                    bar.classList.add('sorted');
+                }
+                if (index === currentIndex) {
+                    bar.classList.add('current');
+                }
+                if (index === compareIndex) {
+                    bar.classList.add('compare');
+                }
+                if (index === shiftIndex) {
+                    bar.classList.add('shift');
+                }
+
+                container.appendChild(bar);
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        function updateStats() {
+            comparisonsText.textContent = comparisons;
+            movesText.textContent = moves;
+        }
+
+        async function startInsertionSort() {
+            if (isSorting) {
+                return;
+            }
+
+            isSorting = true;
+            comparisons = 0;
+            moves = 0;
+            updateStats();
+            startBtn.disabled = true;
+            resetBtn.disabled = true;
+
+            const n = array.length;
+
+            renderArray({ sortedEnd: 0 });
+            await sleep(350);
+
+            for (let i = 1; i < n; i++) {
+                const key = array[i];
+                let j = i - 1;
+
+                statusText.textContent = `第 ${i} 輪：取出 key = ${key}`;
+                renderArray({ sortedEnd: i - 1, currentIndex: i });
+                await sleep(450);
+
+                while (j >= 0) {
+                    comparisons++;
+                    updateStats();
+
+                    statusText.textContent = `比較 array[${j}] = ${array[j]} 與 key = ${key}`;
+                    renderArray({
+                        sortedEnd: i - 1,
+                        currentIndex: i,
+                        compareIndex: j
+                    });
+                    await sleep(450);
+
+                    if (array[j] > key) {
+                        array[j + 1] = array[j];
+                        moves++;
+                        updateStats();
+
+                        statusText.textContent = `array[${j}] > key，元素右移到位置 ${j + 1}`;
+                        renderArray({
+                            sortedEnd: i - 1,
+                            currentIndex: i,
+                            shiftIndex: j + 1
+                        });
+                        await sleep(450);
+
+                        j--;
+                    } else {
+                        break;
+                    }
+                }
+
+                array[j + 1] = key;
+                moves++;
+                updateStats();
+
+                statusText.textContent = `把 key = ${key} 插入位置 ${j + 1}`;
+                renderArray({ sortedEnd: i });
+                await sleep(500);
+            }
+
+            statusText.textContent = '排序完成：整個陣列已由小到大排列';
+            renderArray({ sortedEnd: array.length - 1 });
+
+            isSorting = false;
+            startBtn.disabled = false;
+            resetBtn.disabled = false;
+        }
+
+        function resetArray() {
+            if (isSorting) {
+                return;
+            }
+
+            array = [...initialArray];
+            comparisons = 0;
+            moves = 0;
+            updateStats();
+            statusText.textContent = '已重置：按下「開始排序」重新觀看插入排序流程';
+            renderArray();
+            startBtn.disabled = false;
+            resetBtn.disabled = false;
+        }
+
+        renderArray();
+    </script>
+</body>
+</html>

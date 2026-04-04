@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>選擇排序法演示</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 90%;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+        .section {
+            margin: 30px 0;
+        }
+        .section h2 {
+            color: #667eea;
+            font-size: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .section ol, .section ul, .section p {
+            color: #555;
+            line-height: 1.8;
+        }
+        .array-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 250px;
+            margin: 30px 0 15px;
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .bar {
+            width: 35px;
+            margin: 0 6px;
+            background-color: #667eea;
+            text-align: center;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 5px;
+            border-radius: 4px;
+            transition: background-color 0.25s;
+            flex-shrink: 0;
+        }
+        .bar.current {
+            background-color: #ff922b;
+        }
+        .bar.scanning {
+            background-color: #ffd43b;
+            color: #333;
+        }
+        .bar.min {
+            background-color: #ff6b6b;
+        }
+        .bar.sorted {
+            background-color: #51cf66;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #667eea;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #764ba2;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .info {
+            background-color: #f0f4ff;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .status {
+            text-align: center;
+            color: #444;
+            font-size: 14px;
+            min-height: 24px;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+            justify-content: center;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            display: inline-block;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            .bar {
+                width: 30px;
+                margin: 0 4px;
+                font-size: 13px;
+            }
+            button {
+                width: 100%;
+                max-width: 220px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 選擇排序法演示</h1>
+
+        <div class="section">
+            <h2>操作原理</h2>
+            <ol>
+                <li>把陣列分成「已排序區」與「未排序區」。</li>
+                <li>每一輪從未排序區中找出最小值。</li>
+                <li>將最小值與未排序區的第一個位置交換，放到正確位置。</li>
+                <li>未排序區向右縮小一格，重複直到完成排序。</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>操作過程步驟</h2>
+            <ol>
+                <li>外圈索引 i 代表本輪要放置最小值的位置。</li>
+                <li>先假設 i 就是最小值索引 minIndex。</li>
+                <li>內圈索引 j 從 i + 1 開始掃描到陣列尾端，持續更新 minIndex。</li>
+                <li>內圈結束後，若 minIndex 不等於 i，就交換兩者。</li>
+                <li>i 往右移動一格，重複以上步驟，直到 i = n - 2。</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>時間複雜度分析</h2>
+            <div class="info">
+                <strong>最壞情況：O(n²)</strong><br>
+                每一輪都要掃描整個未排序區找最小值，總比較次數為二次方等級
+            </div>
+            <div class="info">
+                <strong>平均情況：O(n²)</strong><br>
+                一般隨機資料下，比較次數仍與 n² 成正比
+            </div>
+            <div class="info">
+                <strong>最佳情況：O(n²)</strong><br>
+                即使資料已接近排序，仍需要完整掃描來確認最小值
+            </div>
+            <div class="info">
+                <strong>空間複雜度：O(1)</strong><br>
+                原地排序，僅使用常數個額外變數；交換次數通常少於氣泡排序
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>視覺化演示</h2>
+            <div class="array-container" id="array-container"></div>
+            <div class="status" id="status-text">按下「開始排序」觀察每輪如何選出最小值</div>
+
+            <div class="legend">
+                <div><span class="dot" style="background:#51cf66;"></span>已排序</div>
+                <div><span class="dot" style="background:#ff922b;"></span>目前位置 i</div>
+                <div><span class="dot" style="background:#ffd43b;"></span>掃描中 j</div>
+                <div><span class="dot" style="background:#ff6b6b;"></span>當前最小值 minIndex</div>
+            </div>
+
+            <div class="controls">
+                <button onclick="startSelectionSort()" id="startBtn">開始排序</button>
+                <button onclick="resetArray()" id="resetBtn">重置</button>
+            </div>
+            <div class="stats">
+                <div>比較次數: <span id="comparisons">0</span></div>
+                <div>交換次數: <span id="swaps">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const initialArray = [64, 34, 25, 12, 22, 11, 90];
+        let array = [...initialArray];
+        let comparisons = 0;
+        let swaps = 0;
+        let isSorting = false;
+
+        const container = document.getElementById('array-container');
+        const statusText = document.getElementById('status-text');
+        const comparisonsText = document.getElementById('comparisons');
+        const swapsText = document.getElementById('swaps');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        function renderArray(state = {}) {
+            const {
+                currentIndex = -1,
+                scanningIndex = -1,
+                minIndex = -1,
+                sortedEnd = -1
+            } = state;
+
+            container.innerHTML = '';
+            const maxValue = Math.max(...array);
+
+            array.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.classList.add('bar');
+                bar.style.height = `${(value / maxValue) * 200}px`;
+                bar.textContent = value;
+
+                if (index <= sortedEnd) {
+                    bar.classList.add('sorted');
+                }
+                if (index === currentIndex) {
+                    bar.classList.add('current');
+                }
+                if (index === scanningIndex) {
+                    bar.classList.add('scanning');
+                }
+                if (index === minIndex) {
+                    bar.classList.add('min');
+                }
+
+                container.appendChild(bar);
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        function updateStats() {
+            comparisonsText.textContent = comparisons;
+            swapsText.textContent = swaps;
+        }
+
+        async function startSelectionSort() {
+            if (isSorting) {
+                return;
+            }
+
+            isSorting = true;
+            comparisons = 0;
+            swaps = 0;
+            updateStats();
+            startBtn.disabled = true;
+            resetBtn.disabled = true;
+
+            const n = array.length;
+
+            for (let i = 0; i < n - 1; i++) {
+                let minIndex = i;
+                statusText.textContent = `第 ${i + 1} 輪：從位置 ${i} 開始尋找最小值`;
+                renderArray({ currentIndex: i, minIndex, sortedEnd: i - 1 });
+                await sleep(450);
+
+                for (let j = i + 1; j < n; j++) {
+                    comparisons++;
+                    updateStats();
+
+                    statusText.textContent = `比較 array[${j}] = ${array[j]} 與目前最小值 array[${minIndex}] = ${array[minIndex]}`;
+                    renderArray({
+                        currentIndex: i,
+                        scanningIndex: j,
+                        minIndex,
+                        sortedEnd: i - 1
+                    });
+                    await sleep(450);
+
+                    if (array[j] < array[minIndex]) {
+                        minIndex = j;
+                        statusText.textContent = `更新最小值索引：minIndex = ${minIndex}（值為 ${array[minIndex]}）`;
+                        renderArray({
+                            currentIndex: i,
+                            scanningIndex: j,
+                            minIndex,
+                            sortedEnd: i - 1
+                        });
+                        await sleep(450);
+                    }
+                }
+
+                if (minIndex !== i) {
+                    [array[i], array[minIndex]] = [array[minIndex], array[i]];
+                    swaps++;
+                    updateStats();
+                    statusText.textContent = `交換位置 ${i} 與 ${minIndex}，把最小值放到前面`;
+                    renderArray({ currentIndex: i, minIndex, sortedEnd: i });
+                    await sleep(550);
+                } else {
+                    statusText.textContent = `位置 ${i} 已是最小值，不需交換`;
+                    renderArray({ currentIndex: i, minIndex, sortedEnd: i });
+                    await sleep(450);
+                }
+            }
+
+            statusText.textContent = '排序完成：整個陣列已由小到大排列';
+            renderArray({ sortedEnd: array.length - 1 });
+
+            isSorting = false;
+            startBtn.disabled = false;
+            resetBtn.disabled = false;
+        }
+
+        function resetArray() {
+            if (isSorting) {
+                return;
+            }
+
+            array = [...initialArray];
+            comparisons = 0;
+            swaps = 0;
+            updateStats();
+            statusText.textContent = '已重置：按下「開始排序」重新觀察流程';
+            renderArray();
+            startBtn.disabled = false;
+            resetBtn.disabled = false;
+        }
+
+        renderArray();
+    </script>
+</body>
+</html>
