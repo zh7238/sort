@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速排序法演示</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
+        }
+
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+            max-width: 980px;
+            width: 92%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+
+        .section {
+            margin: 30px 0;
+        }
+
+        .section h2 {
+            color: #d9473f;
+            font-size: 18px;
+            border-bottom: 2px solid #d9473f;
+            padding-bottom: 10px;
+        }
+
+        .section ol, .section ul, .section p {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .array-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 250px;
+            margin: 30px 0 15px;
+            background-color: #fff4f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .bar {
+            width: 34px;
+            margin: 0 5px;
+            background-color: #d9473f;
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 5px;
+            border-radius: 4px;
+            transition: background-color 0.25s;
+            flex-shrink: 0;
+        }
+
+        .bar.active-range {
+            background-color: #ff8a65;
+        }
+
+        .bar.pivot {
+            background-color: #6a1b9a;
+        }
+
+        .bar.compare {
+            background-color: #ffd54f;
+            color: #333;
+        }
+
+        .bar.swap {
+            background-color: #00acc1;
+        }
+
+        .bar.sorted {
+            background-color: #4caf50;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #d9473f;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #b83a33;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .info {
+            background-color: #fff0ed;
+            padding: 15px;
+            border-left: 4px solid #d9473f;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .status {
+            text-align: center;
+            color: #444;
+            font-size: 14px;
+            min-height: 24px;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            display: inline-block;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .bar {
+                width: 28px;
+                margin: 0 4px;
+                font-size: 12px;
+            }
+
+            button {
+                width: 100%;
+                max-width: 220px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ 快速排序法演示</h1>
+
+        <div class="section">
+            <h2>操作原理</h2>
+            <ol>
+                <li>選一個基準值（pivot），把陣列分成小於與大於 pivot 的兩側。</li>
+                <li>pivot 排到最終正確位置後，左右兩側可獨立排序。</li>
+                <li>對左子陣列、右子陣列重複同樣分割。</li>
+                <li>遞迴結束後，整體陣列即完成排序。</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>操作過程步驟</h2>
+            <ol>
+                <li>呼叫 quickSort(low, high)。</li>
+                <li>若 low &gt;= high，該區間已完成。</li>
+                <li>執行 partition：以最右元素作為 pivot。</li>
+                <li>掃描 low..high-1，把小於等於 pivot 的元素移到左側。</li>
+                <li>最後把 pivot 交換到分界位置 p。</li>
+                <li>遞迴排序 [low..p-1] 與 [p+1..high]。</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>時間複雜度分析</h2>
+            <div class="info">
+                <strong>最壞情況：O(n^2)</strong><br>
+                每次分割都非常不平均（例如已排序資料且 pivot 取邊界）
+            </div>
+            <div class="info">
+                <strong>平均情況：O(n log n)</strong><br>
+                隨機資料下，分割通常較平均，效率很好
+            </div>
+            <div class="info">
+                <strong>最佳情況：O(n log n)</strong><br>
+                每次都能接近對半分割
+            </div>
+            <div class="info">
+                <strong>空間複雜度：O(log n)</strong><br>
+                主要來自遞迴呼叫堆疊（平均）
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>視覺化演示</h2>
+            <div class="array-container" id="array-container"></div>
+            <div class="status" id="status-text">按下「開始排序」觀察 pivot 分割與遞迴排序流程</div>
+
+            <div class="legend">
+                <div><span class="dot" style="background:#ff8a65;"></span>目前分割區間</div>
+                <div><span class="dot" style="background:#6a1b9a;"></span>pivot</div>
+                <div><span class="dot" style="background:#ffd54f;"></span>比較中</div>
+                <div><span class="dot" style="background:#00acc1;"></span>交換中</div>
+                <div><span class="dot" style="background:#4caf50;"></span>排序完成</div>
+            </div>
+
+            <div class="controls">
+                <button onclick="startQuickSort()" id="startBtn">開始排序</button>
+                <button onclick="resetArray()" id="resetBtn">重置</button>
+            </div>
+
+            <div class="stats">
+                <div>比較次數: <span id="comparisons">0</span></div>
+                <div>交換次數: <span id="swaps">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const initialArray = [64, 34, 25, 12, 22, 11, 90, 45];
+        let array = [...initialArray];
+        let comparisons = 0;
+        let swaps = 0;
+        let isSorting = false;
+
+        const sortedIndices = new Set();
+
+        const container = document.getElementById('array-container');
+        const statusText = document.getElementById('status-text');
+        const comparisonsText = document.getElementById('comparisons');
+        const swapsText = document.getElementById('swaps');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        function renderArray(state = {}) {
+            const {
+                rangeLow = -1,
+                rangeHigh = -1,
+                pivotIndex = -1,
+                compareIndex = -1,
+                swapA = -1,
+                swapB = -1,
+                allSorted = false
+            } = state;
+
+            container.innerHTML = '';
+            const maxValue = Math.max(...array);
+
+            array.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.classList.add('bar');
+                bar.style.height = `${(value / maxValue) * 200}px`;
+                bar.textContent = value;
+
+                if (allSorted || sortedIndices.has(index)) {
+                    bar.classList.add('sorted');
+                } else {
+                    if (index >= rangeLow && index <= rangeHigh) {
+                        bar.classList.add('active-range');
+                    }
+                    if (index === pivotIndex) {
+                        bar.classList.add('pivot');
+                    }
+                    if (index === compareIndex) {
+                        bar.classList.add('compare');
+                    }
+                    if (index === swapA || index === swapB) {
+                        bar.classList.add('swap');
+                    }
+                }
+
+                container.appendChild(bar);
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        function updateStats() {
+            comparisonsText.textContent = comparisons;
+            swapsText.textContent = swaps;
+        }
+
+        async function partition(low, high) {
+            const pivot = array[high];
+            let i = low - 1;
+
+            statusText.textContent = `選擇 pivot = ${pivot}（索引 ${high}）`;
+            renderArray({ rangeLow: low, rangeHigh: high, pivotIndex: high });
+            await sleep(420);
+
+            for (let j = low; j < high; j++) {
+                comparisons++;
+                updateStats();
+
+                statusText.textContent = `比較 array[${j}] = ${array[j]} 與 pivot = ${pivot}`;
+                renderArray({
+                    rangeLow: low,
+                    rangeHigh: high,
+                    pivotIndex: high,
+                    compareIndex: j
+                });
+                await sleep(360);
+
+                if (array[j] <= pivot) {
+                    i++;
+                    if (i !== j) {
+                        [array[i], array[j]] = [array[j], array[i]];
+                        swaps++;
+                        updateStats();
+
+                        statusText.textContent = `array[${j}] <= pivot，交換到左側分區`;
+                        renderArray({
+                            rangeLow: low,
+                            rangeHigh: high,
+                            pivotIndex: high,
+                            swapA: i,
+                            swapB: j
+                        });
+                        await sleep(360);
+                    }
+                }
+            }
+
+            [array[i + 1], array[high]] = [array[high], array[i + 1]];
+            swaps++;
+            updateStats();
+
+            statusText.textContent = `pivot 歸位到索引 ${i + 1}`;
+            renderArray({
+                rangeLow: low,
+                rangeHigh: high,
+                pivotIndex: i + 1,
+                swapA: i + 1,
+                swapB: high
+            });
+            await sleep(420);
+
+            sortedIndices.add(i + 1);
+            return i + 1;
+        }
+
+        async function quickSort(low, high) {
+            if (low > high) {
+                return;
+            }
+
+            if (low === high) {
+                sortedIndices.add(low);
+                renderArray({ rangeLow: low, rangeHigh: high });
+                await sleep(200);
+                return;
+            }
+
+            const p = await partition(low, high);
+            await quickSort(low, p - 1);
+            await quickSort(p + 1, high);
+        }
+
+        async function startQuickSort() {
+            if (isSorting) {
+                return;
+            }
+
+            isSorting = true;
+            comparisons = 0;
+            swaps = 0;
+            sortedIndices.clear();
+            updateStats();
+            startBtn.disabled = true;
+            resetBtn.disabled = true;
+
+            await quickSort(0, array.length - 1);
+
+            statusText.textContent = '排序完成：整個陣列已由小到大排列';
+            renderArray({ allSorted: true });
+
+            isSorting = false;
+            startBtn.disabled = false;
+            resetBtn.disabled = false;
+        }
+
+        function resetArray() {
+            if (isSorting) {
+                return;
+            }
+
+            array = [...initialArray];
+            comparisons = 0;
+            swaps = 0;
+            sortedIndices.clear();
+            updateStats();
+            statusText.textContent = '已重置：按下「開始排序」重新觀看快速排序流程';
+            renderArray();
+            startBtn.disabled = false;
+            resetBtn.disabled = false;
+        }
+
+        renderArray();
+    </script>
+</body>
+</html>

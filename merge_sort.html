@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合併排序法演示</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+            max-width: 980px;
+            width: 92%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+
+        .section {
+            margin: 30px 0;
+        }
+
+        .section h2 {
+            color: #5a3ec8;
+            font-size: 18px;
+            border-bottom: 2px solid #5a3ec8;
+            padding-bottom: 10px;
+        }
+
+        .section ol, .section ul, .section p {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .array-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 250px;
+            margin: 30px 0 15px;
+            background-color: #f7f5ff;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .bar {
+            width: 34px;
+            margin: 0 5px;
+            background-color: #5a3ec8;
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 5px;
+            border-radius: 4px;
+            transition: background-color 0.25s;
+            flex-shrink: 0;
+        }
+
+        .bar.active-range {
+            background-color: #8e75ff;
+        }
+
+        .bar.left {
+            background-color: #ff8f00;
+        }
+
+        .bar.right {
+            background-color: #00acc1;
+        }
+
+        .bar.writing {
+            background-color: #ff5252;
+        }
+
+        .bar.sorted {
+            background-color: #4caf50;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #5a3ec8;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #472ea8;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .info {
+            background-color: #f3efff;
+            padding: 15px;
+            border-left: 4px solid #5a3ec8;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .status {
+            text-align: center;
+            color: #444;
+            font-size: 14px;
+            min-height: 24px;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            display: inline-block;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .bar {
+                width: 28px;
+                margin: 0 4px;
+                font-size: 12px;
+            }
+
+            button {
+                width: 100%;
+                max-width: 220px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 合併排序法演示</h1>
+
+        <div class="section">
+            <h2>操作原理</h2>
+            <ol>
+                <li>使用分治法，把陣列不斷切成左右兩半。</li>
+                <li>每一半再繼續切分，直到子陣列長度為 1。</li>
+                <li>將相鄰的兩個已排序子陣列合併成更大的已排序陣列。</li>
+                <li>重複合併，最後得到完整排序結果。</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>操作過程步驟</h2>
+            <ol>
+                <li>呼叫 mergeSort(left, right)。</li>
+                <li>若 left &gt;= right，代表區間只剩一個元素，直接返回。</li>
+                <li>計算 mid，把區間切成 [left..mid] 與 [mid+1..right]。</li>
+                <li>遞迴排序左右區間。</li>
+                <li>比較左右兩側目前元素，較小者放進暫存陣列。</li>
+                <li>把暫存結果寫回原陣列，完成該區間排序。</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>時間複雜度分析</h2>
+            <div class="info">
+                <strong>最壞情況：O(n log n)</strong><br>
+                每層合併要掃過 n 個元素，總共有 log n 層
+            </div>
+            <div class="info">
+                <strong>平均情況：O(n log n)</strong><br>
+                分割與合併結構固定，平均效率也維持在 n log n
+            </div>
+            <div class="info">
+                <strong>最佳情況：O(n log n)</strong><br>
+                即使資料接近有序，仍要進行完整分割與合併流程
+            </div>
+            <div class="info">
+                <strong>空間複雜度：O(n)</strong><br>
+                需要額外暫存陣列來進行合併
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>視覺化演示</h2>
+            <div class="array-container" id="array-container"></div>
+            <div class="status" id="status-text">按下「開始排序」觀察分割與合併寫回的過程</div>
+
+            <div class="legend">
+                <div><span class="dot" style="background:#8e75ff;"></span>目前合併區間</div>
+                <div><span class="dot" style="background:#ff8f00;"></span>左半比較指標</div>
+                <div><span class="dot" style="background:#00acc1;"></span>右半比較指標</div>
+                <div><span class="dot" style="background:#ff5252;"></span>寫回位置</div>
+                <div><span class="dot" style="background:#4caf50;"></span>排序完成</div>
+            </div>
+
+            <div class="controls">
+                <button onclick="startMergeSort()" id="startBtn">開始排序</button>
+                <button onclick="resetArray()" id="resetBtn">重置</button>
+            </div>
+
+            <div class="stats">
+                <div>比較次數: <span id="comparisons">0</span></div>
+                <div>寫回次數: <span id="writes">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const initialArray = [64, 34, 25, 12, 22, 11, 90, 45];
+        let array = [...initialArray];
+        let comparisons = 0;
+        let writes = 0;
+        let isSorting = false;
+
+        const container = document.getElementById('array-container');
+        const statusText = document.getElementById('status-text');
+        const comparisonsText = document.getElementById('comparisons');
+        const writesText = document.getElementById('writes');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        function renderArray(state = {}) {
+            const {
+                rangeLeft = -1,
+                rangeRight = -1,
+                leftPointer = -1,
+                rightPointer = -1,
+                writeIndex = -1,
+                allSorted = false
+            } = state;
+
+            container.innerHTML = '';
+            const maxValue = Math.max(...array);
+
+            array.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.classList.add('bar');
+                bar.style.height = `${(value / maxValue) * 200}px`;
+                bar.textContent = value;
+
+                if (allSorted) {
+                    bar.classList.add('sorted');
+                } else {
+                    if (index >= rangeLeft && index <= rangeRight) {
+                        bar.classList.add('active-range');
+                    }
+                    if (index === leftPointer) {
+                        bar.classList.add('left');
+                    }
+                    if (index === rightPointer) {
+                        bar.classList.add('right');
+                    }
+                    if (index === writeIndex) {
+                        bar.classList.add('writing');
+                    }
+                }
+
+                container.appendChild(bar);
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        function updateStats() {
+            comparisonsText.textContent = comparisons;
+            writesText.textContent = writes;
+        }
+
+        async function merge(left, mid, right) {
+            const leftArray = array.slice(left, mid + 1);
+            const rightArray = array.slice(mid + 1, right + 1);
+
+            let i = 0;
+            let j = 0;
+            let k = left;
+
+            while (i < leftArray.length && j < rightArray.length) {
+                comparisons++;
+                updateStats();
+
+                statusText.textContent = `比較左側 ${leftArray[i]} 與右側 ${rightArray[j]}`;
+                renderArray({
+                    rangeLeft: left,
+                    rangeRight: right,
+                    leftPointer: left + i,
+                    rightPointer: mid + 1 + j,
+                    writeIndex: k
+                });
+                await sleep(420);
+
+                if (leftArray[i] <= rightArray[j]) {
+                    array[k] = leftArray[i];
+                    i++;
+                } else {
+                    array[k] = rightArray[j];
+                    j++;
+                }
+
+                writes++;
+                updateStats();
+                statusText.textContent = `寫回位置 ${k} 的值為 ${array[k]}`;
+                renderArray({
+                    rangeLeft: left,
+                    rangeRight: right,
+                    writeIndex: k
+                });
+                await sleep(360);
+
+                k++;
+            }
+
+            while (i < leftArray.length) {
+                array[k] = leftArray[i];
+                i++;
+                writes++;
+                updateStats();
+
+                statusText.textContent = `左側剩餘元素寫回位置 ${k}`;
+                renderArray({
+                    rangeLeft: left,
+                    rangeRight: right,
+                    writeIndex: k
+                });
+                await sleep(320);
+
+                k++;
+            }
+
+            while (j < rightArray.length) {
+                array[k] = rightArray[j];
+                j++;
+                writes++;
+                updateStats();
+
+                statusText.textContent = `右側剩餘元素寫回位置 ${k}`;
+                renderArray({
+                    rangeLeft: left,
+                    rangeRight: right,
+                    writeIndex: k
+                });
+                await sleep(320);
+
+                k++;
+            }
+        }
+
+        async function mergeSort(left, right) {
+            if (left >= right) {
+                return;
+            }
+
+            const mid = Math.floor((left + right) / 2);
+
+            statusText.textContent = `分割區間 [${left}..${right}]，中點為 ${mid}`;
+            renderArray({ rangeLeft: left, rangeRight: right });
+            await sleep(420);
+
+            await mergeSort(left, mid);
+            await mergeSort(mid + 1, right);
+
+            statusText.textContent = `合併區間 [${left}..${mid}] 與 [${mid + 1}..${right}]`;
+            renderArray({ rangeLeft: left, rangeRight: right });
+            await sleep(420);
+
+            await merge(left, mid, right);
+        }
+
+        async function startMergeSort() {
+            if (isSorting) {
+                return;
+            }
+
+            isSorting = true;
+            comparisons = 0;
+            writes = 0;
+            updateStats();
+            startBtn.disabled = true;
+            resetBtn.disabled = true;
+
+            await mergeSort(0, array.length - 1);
+
+            statusText.textContent = '排序完成：整個陣列已由小到大排列';
+            renderArray({ allSorted: true });
+
+            isSorting = false;
+            startBtn.disabled = false;
+            resetBtn.disabled = false;
+        }
+
+        function resetArray() {
+            if (isSorting) {
+                return;
+            }
+
+            array = [...initialArray];
+            comparisons = 0;
+            writes = 0;
+            updateStats();
+            statusText.textContent = '已重置：按下「開始排序」重新觀看分割與合併流程';
+            renderArray();
+            startBtn.disabled = false;
+            resetBtn.disabled = false;
+        }
+
+        renderArray();
+    </script>
+</body>
+</html>
