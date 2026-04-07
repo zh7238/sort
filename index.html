@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排序法學習首頁</title>
+    <style>
+        :root {
+            --bg-1: #f6f7fb;
+            --bg-2: #e7f3ff;
+            --ink: #1f2937;
+            --muted: #5f6b7a;
+            --line: #d8e3f0;
+            --card: #ffffff;
+            --bubble: #1e88e5;
+            --selection: #00897b;
+            --insertion: #ef6c00;
+            --merge: #6a11cb;
+            --quick: #d9473f;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Noto Sans TC', sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 0% 0%, #ffffff 0%, transparent 35%),
+                radial-gradient(circle at 100% 100%, #d9f0ff 0%, transparent 40%),
+                linear-gradient(140deg, var(--bg-1), var(--bg-2));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 32px 16px;
+        }
+
+        .shell {
+            width: min(980px, 100%);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(20, 44, 82, 0.12);
+            backdrop-filter: blur(4px);
+            overflow: hidden;
+        }
+
+        .hero {
+            padding: 36px 28px 26px;
+            background: linear-gradient(95deg, #fafdff 0%, #eef7ff 100%);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .hero h1 {
+            margin: 0 0 10px;
+            font-size: clamp(26px, 4vw, 38px);
+            letter-spacing: 0.4px;
+        }
+
+        .hero p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            padding: 24px;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px;
+            border-radius: 16px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            box-shadow: 0 8px 20px rgba(34, 56, 89, 0.08);
+            transform: translateY(6px);
+            opacity: 0;
+            animation: rise 0.55s ease forwards;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.08s;
+        }
+
+        .card:nth-child(3) {
+            animation-delay: 0.16s;
+        }
+
+        .tag {
+            width: fit-content;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            color: white;
+            border-radius: 999px;
+            padding: 4px 10px;
+        }
+
+        .tag.bubble {
+            background: var(--bubble);
+        }
+
+        .tag.selection {
+            background: var(--selection);
+        }
+
+        .tag.insertion {
+            background: var(--insertion);
+        }
+
+        .tag.merge {
+            background: var(--merge);
+        }
+
+        .tag.quick {
+            background: var(--quick);
+        }
+
+        .card h2 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .meta {
+            margin-top: auto;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .action {
+            display: inline-block;
+            margin-top: 6px;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 10px 14px;
+            border-radius: 10px;
+            transition: transform 0.2s ease, filter 0.2s ease;
+            color: white;
+        }
+
+        .action:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.04);
+        }
+
+        .action.bubble {
+            background: var(--bubble);
+        }
+
+        .action.selection {
+            background: var(--selection);
+        }
+
+        .action.insertion {
+            background: var(--insertion);
+        }
+
+        .action.merge {
+            background: var(--merge);
+        }
+
+        .action.quick {
+            background: var(--quick);
+        }
+
+        .footer {
+            padding: 0 24px 24px;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 860px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="hero">
+            <h1>排序法學習導覽</h1>
+            <p>這個首頁幫你整理了五種排序法教學頁。每一頁都包含操作原理、步驟流程、時間與空間複雜度，以及可視化動畫。</p>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <span class="tag bubble">BUBBLE SORT</span>
+                <h2>氣泡排序法</h2>
+                <p>透過相鄰元素反覆比較與交換，讓較大值逐步「浮」到後方。</p>
+                <div class="meta">複雜度: 最佳 O(n), 平均/最差 O(n^2)</div>
+                <a class="action bubble" href="bubble_sort.html">開啟教學頁</a>
+            </article>
+
+            <article class="card">
+                <span class="tag selection">SELECTION SORT</span>
+                <h2>選擇排序法</h2>
+                <p>每一輪在未排序區選出最小值，放到前面正確位置。</p>
+                <div class="meta">複雜度: 最佳/平均/最差 O(n^2)</div>
+                <a class="action selection" href="selection_sort.html">開啟教學頁</a>
+            </article>
+
+            <article class="card">
+                <span class="tag insertion">INSERTION SORT</span>
+                <h2>插入排序法</h2>
+                <p>把當前元素插入左側已排序區，就像整理手上的撲克牌。</p>
+                <div class="meta">複雜度: 最佳 O(n), 平均/最差 O(n^2)</div>
+                <a class="action insertion" href="insertion_sort.html">開啟教學頁</a>
+            </article>
+
+            <article class="card">
+                <span class="tag merge">MERGE SORT</span>
+                <h2>合併排序法</h2>
+                <p>用分治法先切分再合併，穩定地維持 n log n 的時間效率。</p>
+                <div class="meta">複雜度: 最佳/平均/最差 O(n log n)</div>
+                <a class="action merge" href="merge_sort.html">開啟教學頁</a>
+            </article>
+
+            <article class="card">
+                <span class="tag quick">QUICK SORT</span>
+                <h2>快速排序法</h2>
+                <p>透過 pivot 分割資料，平均情況下有非常優秀的排序效率。</p>
+                <div class="meta">複雜度: 平均 O(n log n), 最差 O(n^2)</div>
+                <a class="action quick" href="quick_sort.html">開啟教學頁</a>
+            </article>
+
+        </section>
+
+        <p class="footer">建議從氣泡排序開始，再觀察選擇排序與插入排序的比較次數和資料移動特性。</p>
+    </main>
+</body>
+</html>
